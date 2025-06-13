@@ -1,14 +1,19 @@
-import type { UserRole } from "@prisma/client";
-
 export interface Profile {
   id: string;
-  userId: string;
-  avatarUrl?: string;
-  birthDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  active: boolean;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+  birthDate?: string | null;
+  role?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserMetadata {
   firstName?: string;
   lastName?: string;
-  role: UserRole;
-} 
+  avatarUrl?: string;
+  birthDate?: string;
+  role?: string;
+}

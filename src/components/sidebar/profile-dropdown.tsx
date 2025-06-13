@@ -13,12 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { Badge } from "@/components/ui/badge";
-import { UserRole } from "@prisma/client";
+import { useAuth } from "@/providers/auth-provider";
 
 export function ProfileDropdown() {
-  const { profile, user, isLoading } = useCurrentUser();
+  const { profile, user, isLoading, signOut } = useAuth();
 
   if (isLoading) {
     return (
@@ -46,11 +45,13 @@ export function ProfileDropdown() {
   };
 
   // Get role display name
-  const getRoleDisplay = (role: UserRole) => {
-    return role
-      .toString()
-      .replace("_", " ")
-      .replace(/\b\w/g, (l) => l.toUpperCase());
+  const getRoleDisplay = (role?: string) => {
+    return (
+      role
+        ?.toString()
+        .replace("_", " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase()) || "User"
+    );
   };
 
   return (
@@ -98,7 +99,7 @@ export function ProfileDropdown() {
               Settings
             </Link>
           </DropdownMenuItem>
-          {profile.role === UserRole.SUPERADMIN && (
+          {profile.role === "SUPERADMIN" && (
             <DropdownMenuItem asChild>
               <Link href="/admin">
                 <BadgeCheck className="mr-2 h-4 w-4" />
@@ -108,12 +109,7 @@ export function ProfileDropdown() {
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={async () => {
-            await fetch("/api/auth/signout", { method: "POST" });
-            window.location.href = "/login";
-          }}
-        >
+        <DropdownMenuItem onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </DropdownMenuItem>

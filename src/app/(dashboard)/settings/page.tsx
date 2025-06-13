@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SettingsForm } from "./components/settings-form";
-import { PasswordDialog } from "./components/password-dialog";
+import { ProfileForm } from "./components/profile-form";
 import { AccountSection } from "./components/account-section";
 import { SettingsLoader } from "./components/settings-loader";
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole, RefreshCw } from "lucide-react";
+import { PasswordDialog } from "@/components/auth/change-password/password-dialog";
+import { DeleteAccount } from "./components/delete-account";
 import {
   Card,
   CardContent,
@@ -17,70 +18,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { SidebarNav } from "./components/sidebar-nav";
+import { settings } from "./settings";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Manage your account settings and preferences.",
+};
+
+const sidebarNavItems = settings.sidebarNav;
 
 export default function SettingsPage() {
-  const { profile, isLoading, refetch } = useCurrentUser();
+  const { profile, isLoading } = useAuth();
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [retryLoading, setRetryLoading] = useState(false);
 
-  // Simulate data loading and ensure everything is ready
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isLoading) {
-        setPageLoading(false);
-      }
-    }, 500); // Small delay to ensure smooth transitions
-
+    const timer = setTimeout(() => setPageLoading(false), 1000);
     return () => clearTimeout(timer);
-  }, [isLoading]);
+  }, []);
 
-  const handleRetry = async () => {
-    setRetryLoading(true);
-    if (refetch) {
-      await refetch();
-      setTimeout(() => setRetryLoading(false), 500);
-    } else {
-      setRetryLoading(false);
-    }
-  };
-
-  // Handle error case
-  if (!isLoading && !profile) {
-    return (
-      <div className="container mx-auto py-10">
-        <Card className="max-w-md mx-auto">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl">
-              No se pudo cargar el perfil
-            </CardTitle>
-            <CardDescription>
-              No se pudo cargar la información de tu perfil. Por favor, intenta
-              nuevamente.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button
-              onClick={handleRetry}
-              className="w-full max-w-xs"
-              disabled={retryLoading}
-            >
-              {retryLoading ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Cargando...
-                </>
-              ) : (
-                "Reintentar"
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show loader while loading
   if (pageLoading || isLoading) {
     return <SettingsLoader />;
   }
@@ -102,7 +61,7 @@ export default function SettingsPage() {
 
         <TabsContent value="profile" className="space-y-6">
           <AccountSection />
-          <SettingsForm />
+          <ProfileForm />
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">

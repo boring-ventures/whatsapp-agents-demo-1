@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FacebookIcon, GithubIcon, UploadCloud } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import Image from "next/image";
 import { uploadAvatar } from "@/lib/supabase/upload-avatar";
 import { useRouter } from "next/navigation";
 import { saltAndHashPassword } from "@/lib/auth/password-crypto";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpFormSchema),
@@ -72,82 +74,53 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
         data.email
       );
 
-      const { success, user, session, confirmEmail, error } = await signUp(
-        data.email,
-        hashedPassword
-      );
-
-      if (!success || error) {
-        throw error || new Error("Failed to sign up");
+      // Prepare user metadata
+      let avatarUrl = null;
+      if (avatarFile) {
+        try {
+          // Create a temporary user ID for avatar upload
+          const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          avatarUrl = await uploadAvatar(avatarFile, tempUserId);
+        } catch (error) {
+          console.error("Avatar upload failed:", error);
+          toast({
+            title: "Warning",
+            description:
+              "Failed to upload avatar, you can add it later from your profile.",
+            variant: "default",
+          });
+        }
       }
 
-      if (user) {
-        let avatarUrl = null;
-        if (avatarFile) {
-          try {
-            avatarUrl = await uploadAvatar(avatarFile, user.id);
-          } catch (error) {
-            console.error("Avatar upload failed:", error);
-            toast({
-              title: "Warning",
-              description:
-                "Failed to upload avatar, you can add it later from your profile.",
-              variant: "default",
-            });
-          }
-        }
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
-        const response = await fetch("/api/profile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.id,
+      // Sign up with user metadata
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: hashedPassword,
+        options: {
+          emailRedirectTo: `${siteUrl}/auth/callback`,
+          data: {
             firstName: data.firstName,
             lastName: data.lastName,
             birthDate: data.birthDate,
             avatarUrl,
-          }),
-        });
+            role: "USER",
+          },
+        },
+      });
 
-        let result: Record<string, unknown>;
-        let text = ""; // Define text outside the try block
+      if (error) throw error;
 
-        try {
-          text = await response.text(); // Assign value inside try
-          result = text ? JSON.parse(text) : {};
+      toast({
+        title: "Success",
+        description:
+          "Your account has been created! Please verify your email to continue.",
+      });
 
-          if (!response.ok) {
-            throw new Error(
-              typeof result.error === "string"
-                ? result.error
-                : `Server responded with status ${response.status}`
-            );
-          }
-        } catch (parseError) {
-          console.error(
-            "Response parsing error:",
-            parseError,
-            "Response text:",
-            text
-          );
-          throw new Error("Invalid server response");
-        }
-
-        toast({
-          title: "Success",
-          description:
-            "Your account has been created! Please verify your email to continue.",
-        });
-
-        // Redirect to verification page instead of dashboard if email confirmation is required
-        if (confirmEmail) {
-          router.push("/verify-email");
-        } else if (session) {
-          router.push("/dashboard");
-        }
-      }
+      // Redirect to verification page
+      router.push("/verify-email");
     } catch (error) {
       console.error("Sign up error:", error);
       const errorMessage =

@@ -2,30 +2,26 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
     const { data } = await supabase.auth.exchangeCodeForSession(code);
 
-    // Create user profile in Prisma if it doesn't exist and we have a session
-    if (data?.session) {
-      const userId = data.session.user.id;
+    // Check if user metadata has basic profile info, if not, set defaults
+    if (data?.session?.user) {
+      const user = data.session.user;
+      const metadata = user.user_metadata || {};
 
-      const existingProfile = await prisma.profile.findUnique({
-        where: { userId },
-      });
-
-      if (!existingProfile) {
-        await prisma.profile.create({
+      // If user doesn't have role set, update it to USER
+      if (!metadata.role) {
+        await supabase.auth.updateUser({
           data: {
-            userId,
-            role: UserRole.USER,
+            role: "USER",
           },
         });
       }

@@ -22,7 +22,7 @@ import { profileFormSchema } from "@/lib/validations/profile";
 import type { ProfileFormValues } from "@/lib/validations/profile";
 
 export function ProfileForm() {
-  const { profile } = useAuth();
+  const { profile, updateProfile } = useAuth();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingChanges, setPendingChanges] =
     useState<ProfileFormValues | null>(null);
@@ -43,21 +43,15 @@ export function ProfileForm() {
   }
 
   async function handleConfirmUpdate() {
-    if (!pendingChanges || !profile?.userId) return;
+    if (!pendingChanges) return;
 
     try {
       setIsUpdating(true);
 
-      const response = await fetch(`/api/profile/${profile.userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...pendingChanges,
-          avatarUrl: newAvatarUrl || profile.avatarUrl,
-        }),
+      await updateProfile({
+        ...pendingChanges,
+        avatarUrl: newAvatarUrl || profile?.avatarUrl || undefined,
       });
-
-      if (!response.ok) throw new Error("Failed to update profile");
 
       toast({
         title: "Profile updated",
@@ -84,7 +78,7 @@ export function ProfileForm() {
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
           {profile && (
             <AvatarUpload
-              userId={profile.userId}
+              userId={profile.id}
               currentAvatarUrl={profile.avatarUrl || null}
               onUploadComplete={(url) => setNewAvatarUrl(url)}
               onUploadError={(error) => {
