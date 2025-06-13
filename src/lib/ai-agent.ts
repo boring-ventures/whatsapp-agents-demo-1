@@ -113,6 +113,57 @@ const getContextString = (sessionId: string): string => {
   return contextStr;
 };
 
+// Type definitions for tool parameters
+interface GetProductsParams {
+  category?: string | null;
+  lowStock?: boolean | null;
+  search?: string | null;
+}
+
+interface CreateProductParams {
+  name: string;
+  description?: string | null;
+  price: number;
+  stock_quantity: number;
+  min_stock_level?: number | null;
+  category?: string | null;
+  barcode?: string | null;
+  userId: string;
+}
+
+interface UpdateStockParams {
+  productId: string;
+  quantity: number;
+  movementType: "purchase" | "sale" | "adjustment" | "return";
+  notes?: string | null;
+  userId: string;
+}
+
+interface GetCustomersParams {
+  search?: string | null;
+  limit?: number | null;
+}
+
+interface CreateCustomerParams {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  userId: string;
+}
+
+interface GetSalesParams {
+  customerId?: string | null;
+  dateFrom?: string | null;
+  dateTo?: string | null;
+  limit?: number | null;
+}
+
+interface GetInventoryReportParams {
+  type: "low_stock" | "movement_summary" | "category_summary";
+  days?: number | null;
+}
+
 // Create a unified AI agent that can handle both basic and inventory operations
 export const createUnifiedAgent = (sessionId: string = "default") => {
   const getProductsTool = tool({
@@ -139,7 +190,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["category", "lowStock", "search"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: GetProductsParams) => {
       // Convert null values to undefined for processing
       const cleanParams = {
         category: params.category || undefined,
@@ -223,7 +274,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       ],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: CreateProductParams) => {
       const result = await createProduct(params);
 
       // Update context with the newly created product
@@ -275,7 +326,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["productId", "quantity", "movementType", "notes", "userId"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: UpdateStockParams) => {
       const result = await updateStock(params);
 
       // Update context with the updated product info
@@ -314,7 +365,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["search", "limit"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: GetCustomersParams) => {
       const result = await getCustomers(params);
 
       // Update context if we found customers
@@ -367,7 +418,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["name", "email", "phone", "address", "userId"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: CreateCustomerParams) => {
       const result = await createCustomer(params);
 
       // Update context with the newly created customer
@@ -413,7 +464,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["customerId", "dateFrom", "dateTo", "limit"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: GetSalesParams) => {
       const result = await getSales(params);
 
       updateContext(sessionId, {
@@ -445,7 +496,7 @@ export const createUnifiedAgent = (sessionId: string = "default") => {
       required: ["type", "days"],
       additionalProperties: false,
     },
-    execute: async (params: any) => {
+    execute: async (params: GetInventoryReportParams) => {
       const result = await getInventoryReport(params);
 
       updateContext(sessionId, {

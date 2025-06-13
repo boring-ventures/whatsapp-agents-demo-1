@@ -96,21 +96,12 @@ export function AccountSection() {
           <div className="space-y-1">
             <p className="text-sm font-medium">Estado</p>
             <div>
-              {profile.active ? (
-                <Badge
-                  variant="outline"
-                  className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200"
-                >
-                  Activo
-                </Badge>
-              ) : (
-                <Badge
-                  variant="outline"
-                  className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200"
-                >
-                  Inactivo
-                </Badge>
-              )}
+              <Badge
+                variant="outline"
+                className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200"
+              >
+                Activo
+              </Badge>
             </div>
           </div>
 

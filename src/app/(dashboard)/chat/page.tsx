@@ -66,9 +66,9 @@ export default function ChatPage() {
         <p className="text-sm text-blue-700">
           I can help you with general questions, manage inventory, track
           products, handle customers, analyze sales, and generate reports. Try
-          asking: <strong>"Show me low stock products"</strong> or{" "}
-          <strong>"Create a new customer"</strong> or{" "}
-          <strong>"What's the weather like?"</strong>
+          asking: <strong>&quot;Show me low stock products&quot;</strong> or{" "}
+          <strong>&quot;Create a new customer&quot;</strong> or{" "}
+          <strong>&quot;What&apos;s the weather like?&quot;</strong>
         </p>
       </div>
 

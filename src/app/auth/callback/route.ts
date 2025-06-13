@@ -8,8 +8,7 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get("code");
 
   if (code) {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const { data } = await supabase.auth.exchangeCodeForSession(code);
 
     // Check if user metadata has basic profile info, if not, set defaults

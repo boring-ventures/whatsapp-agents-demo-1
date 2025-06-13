@@ -38,11 +38,15 @@ export async function POST(request: NextRequest) {
     const result = await run(agent, contextualMessage);
 
     // Add assistant response to memory
-    addToMemory(sessionId, "assistant", result.finalOutput);
+    addToMemory(
+      sessionId,
+      "assistant",
+      result.finalOutput || "No response generated"
+    );
 
     return NextResponse.json({
       success: true,
-      response: result.finalOutput,
+      response: result.finalOutput || "No response generated",
       user: session.user.name || session.user.email,
       sessionId: sessionId, // Include session ID for debugging
     });

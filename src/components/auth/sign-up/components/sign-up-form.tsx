@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FacebookIcon, GithubIcon, UploadCloud } from "lucide-react";
-import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +27,6 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp } = useAuth();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [password, setPassword] = useState("");

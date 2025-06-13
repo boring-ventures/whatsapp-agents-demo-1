@@ -11,8 +11,8 @@ export interface Profile {
 }
 
 export interface UserMetadata {
-  firstName?: string;
-  lastName?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   avatarUrl?: string;
   birthDate?: string;
   role?: string;

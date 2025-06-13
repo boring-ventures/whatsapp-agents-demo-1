@@ -1,21 +1,8 @@
 import {
-  AlertCircle,
-  AppWindow,
   AudioWaveform,
-  Ban,
-  Bug,
-  CheckSquare,
   Command,
   GalleryVerticalEnd,
-  HelpCircle,
-  LayoutDashboard,
-  Lock,
-  LockKeyhole,
   MessageSquare,
-  Settings,
-  ServerCrash,
-  UserX,
-  Users,
 } from "lucide-react";
 import type { SidebarData } from "../types";
 

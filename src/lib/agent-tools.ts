@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 
 // Database tool functions for the AI agent
 export const getProductsSchema = z.object({
@@ -13,7 +14,7 @@ export const getProducts = async (
 ) => {
   const { category, lowStock, search } = params;
 
-  const where: any = {};
+  const where: Prisma.productsWhereInput = {};
 
   if (category) {
     where.category = {
@@ -224,7 +225,7 @@ export const getCustomers = async (
 ) => {
   const { search, limit = 10 } = params;
 
-  const where: any = {};
+  const where: Prisma.customersWhereInput = {};
 
   if (search) {
     where.OR = [
@@ -313,7 +314,7 @@ export const getSalesSchema = z.object({
 export const getSales = async (params: z.infer<typeof getSalesSchema>) => {
   const { customerId, dateFrom, dateTo, limit = 20 } = params;
 
-  const where: any = {};
+  const where: Prisma.salesWhereInput = {};
 
   if (customerId) {
     where.customer_id = customerId;

@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SettingsPage() {
-  const { profile, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
