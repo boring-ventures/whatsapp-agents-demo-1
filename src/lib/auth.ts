@@ -20,7 +20,7 @@ export async function auth(): Promise<Session | null> {
 
   // If you're implementing a real auth system, replace this with actual auth logic
   const mockUser: User = {
-    id: "user_123",
+    id: "53300e26-01eb-4c5c-9cb6-a6b63c9477e8", // Use a proper UUID format that matches the database
     email: "user@example.com",
     name: "Demo User",
     role: "USER",
