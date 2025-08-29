@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to prevent static generation issues with cookies
+export const dynamic = "force-dynamic";
+
 import { Send, Bot, User, Settings, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

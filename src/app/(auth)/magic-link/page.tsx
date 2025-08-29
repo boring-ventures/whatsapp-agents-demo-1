@@ -4,6 +4,9 @@ import AuthLayout from "@/components/auth/auth-layout";
 import { MagicLinkForm } from "@/components/auth/magic-link/components/magic-link-form";
 import Link from "next/link";
 
+// Force dynamic rendering to prevent static generation issues with cookies
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign In with Magic Link",
   description: "Sign in without a password",

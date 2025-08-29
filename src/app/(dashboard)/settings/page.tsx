@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to prevent static generation issues with cookies
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import { ProfileForm } from "./components/profile-form";
 import { AccountSection } from "./components/account-section";

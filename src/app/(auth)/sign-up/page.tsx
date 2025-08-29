@@ -4,6 +4,9 @@ import AuthLayout from "@/components/auth/auth-layout";
 import { SignUpForm } from "@/components/auth/sign-up/components/sign-up-form";
 import Link from "next/link";
 
+// Force dynamic rendering to prevent static generation issues with cookies
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign Up",
   description: "Create a new account",
